@@ -19,7 +19,8 @@ export async function POST() {
 
   if (!authResponse.ok) return Response.redirect(new URL("/demo?error=unavailable", base), 303);
 
-  const response = Response.redirect(new URL("/agenda", base), 303);
-  for (const cookie of authResponse.headers.getSetCookie()) response.headers.append("set-cookie", cookie);
-  return response;
+  const headers = new Headers({ location: new URL("/agenda", base).toString() });
+  for (const cookie of authResponse.headers.getSetCookie()) headers.append("set-cookie", cookie);
+
+  return new Response(null, { status: 303, headers });
 }
