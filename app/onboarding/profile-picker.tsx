@@ -2,10 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createOnboarding } from "./actions";
 import styles from "../access.module.css";
 
 type ProfileId = "professional" | "clinic" | "join";
-type FieldName = "name" | "country" | "city" | "address" | "primaryPhone" | "secondaryPhone" | "email" | "accepted";
+type FieldName = "name" | "country" | "city" | "address" | "primaryPhone" | "secondaryPhone" | "email" | "accepted" | "form";
 type Errors = Partial<Record<FieldName, string>>;
 
 const profiles: Array<{ id: ProfileId; title: string; description: string; detail: string; icon: "person" | "building" | "community" }> = [
@@ -30,11 +32,14 @@ function Field({ name, label, type = "text", placeholder, optional, error }: { n
 }
 
 function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; onBack: () => void }) {
+  const router = useRouter();
   const [errors, setErrors] = useState<Errors>({});
   const [complete, setComplete] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [redirectTo, setRedirectTo] = useState("/agenda");
   const isClinic = profile === "clinic";
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const nextErrors: Errors = {};
@@ -53,7 +58,23 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
     if (email && !/^\S+@\S+\.\S+$/.test(email)) nextErrors.email = "Ingresa un email válido.";
     if (data.get("accepted") !== "on") nextErrors.accepted = "Debes aceptar las políticas y los términos para continuar.";
     setErrors(nextErrors);
-    setComplete(Object.keys(nextErrors).length === 0);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    data.set("type", isClinic ? "clinic" : "independent");
+    setIsPending(true);
+    try {
+      const result = await createOnboarding(data);
+      if (!result.ok) {
+        setErrors(result.errors);
+        return;
+      }
+      setRedirectTo(result.redirectTo);
+      setComplete(true);
+    } catch {
+      setErrors({ form: "No pudimos validar tu sesión. Vuelve a ingresar e inténtalo nuevamente." });
+    } finally {
+      setIsPending(false);
+    }
   }
 
   return <div className={styles.profileScreen}>
@@ -64,9 +85,10 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
     </div>
     {complete ? <div className={styles.successPanel} role="status">
       <strong>Configuración lista</strong>
-      <p>Tu {isClinic ? "clínica" : "consulta"} quedó configurada. En la próxima versión conectaremos tu espacio.</p>
-      <button type="button" className={styles.secondaryButton} onClick={onBack}>Elegir otro perfil</button>
+      <p>Tu {isClinic ? "clínica" : "consulta"} quedó configurada y ya puedes comenzar a usar NexoDent.</p>
+      <button type="button" className={styles.primaryButton} onClick={() => router.replace(redirectTo)}>Ir a mi espacio</button>
     </div> : <form className={styles.profileForm} onSubmit={handleSubmit} noValidate>
+      {errors.form && <p className={styles.fieldError} role="alert">{errors.form}</p>}
       <div className={styles.formGrid}>
         <Field name="name" label={isClinic ? "Nombre de la clínica" : "Nombre"} error={errors.name} />
         <Field name="country" label="País" placeholder="Chile" error={errors.country} />
@@ -81,7 +103,9 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
         <label><input name="accepted" type="checkbox" /> <span>Acepto las <Link href="/#privacidad">Políticas de Privacidad</Link> y los <Link href="/#terminos">Términos y Condiciones</Link> de NexoDent</span></label>
         {errors.accepted && <small id="accepted-error" className={styles.fieldError} role="alert">{errors.accepted}</small>}
       </fieldset>
-      <button type="submit" className={styles.primaryButton}>{isClinic ? "Crear mi clínica" : "Crear mi consulta"}</button>
+      <button type="submit" className={styles.primaryButton} disabled={isPending} aria-busy={isPending}>
+        {isPending ? "Creando tu espacio…" : isClinic ? "Crear mi clínica" : "Crear mi consulta"}
+      </button>
     </form>}
   </div>;
 }
