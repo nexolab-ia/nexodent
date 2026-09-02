@@ -4,7 +4,8 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createOnboarding } from "./actions";
-import { CHILE_REGIONS } from "./regions";
+import { COUNTRY_OPTIONS } from "./regions";
+import type { RegionOption } from "./regions";
 import styles from "../access.module.css";
 
 type ProfileId = "professional" | "clinic" | "join";
@@ -32,15 +33,29 @@ function Field({ name, label, type = "text", placeholder, optional, error }: { n
   </label>;
 }
 
-// Selector de ciudad agrupado por región de Chile: al desplegarse muestra cada
-// región (optgroup) con sus principales ciudades (option).
-function CityField({ error }: { error?: string }) {
+// Selector de país: por ahora solo Chile (COUNTRY_OPTIONS), pero diseñado para
+// expandirse. Envía el nombre del país (visible/BBDD); el código ISO queda en el
+// dataset para futura i18n. Al elegir otro país, la ciudad muestra sus regiones.
+function CountryField({ error, onChange }: { error?: string; onChange: (name: string) => void }) {
+  const errorId = "country-error";
+  return <label className={styles.profileField}>
+    <span>País</span>
+    <select name="country" defaultValue="Chile" onChange={(e) => onChange(e.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined}>
+      {COUNTRY_OPTIONS.map((country) => <option key={country.code} value={country.name}>{country.name}</option>)}
+    </select>
+    {error && <small id={errorId} className={styles.fieldError} role="alert">{error}</small>}
+  </label>;
+}
+
+// Selector de ciudad agrupado por región: al desplegarse muestra cada región
+// (optgroup) con sus principales ciudades (option), del país seleccionado.
+function CityField({ regions, error }: { regions: RegionOption[]; error?: string }) {
   const errorId = "city-error";
   return <label className={styles.profileField}>
     <span>Ciudad</span>
     <select name="city" defaultValue="" aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined}>
       <option value="" disabled>Selecciona tu ciudad…</option>
-      {CHILE_REGIONS.map((region) => (
+      {regions.map((region) => (
         <optgroup key={region.id} label={region.label}>
           {region.cities.map((city) => <option key={city} value={city}>{city}</option>)}
         </optgroup>
@@ -56,6 +71,8 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
   const [complete, setComplete] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [redirectTo, setRedirectTo] = useState("/agenda");
+  const [countryName, setCountryName] = useState<string>(COUNTRY_OPTIONS[0].name);
+  const activeCountry = COUNTRY_OPTIONS.find((c) => c.name === countryName) ?? COUNTRY_OPTIONS[0];
   const isClinic = profile === "clinic";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -110,8 +127,8 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
       {errors.form && <p className={styles.fieldError} role="alert">{errors.form}</p>}
       <div className={styles.formGrid}>
         <Field name="name" label={isClinic ? "Nombre de la clínica" : "Nombre"} error={errors.name} />
-        <Field name="country" label="País" placeholder="Chile" error={errors.country} />
-        <CityField error={errors.city} />
+        <CountryField error={errors.country} onChange={setCountryName} />
+        <CityField regions={activeCountry.regions} error={errors.city} />
         <Field name="address" label="Dirección" error={errors.address} />
         <Field name="primaryPhone" label="Teléfono principal" type="tel" error={errors.primaryPhone} />
         <Field name="secondaryPhone" label="Teléfono secundario" type="tel" optional error={errors.secondaryPhone} />
