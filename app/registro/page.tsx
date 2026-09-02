@@ -3,12 +3,18 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
 import { auth } from "@/lib/auth";
+import { activeMembershipForUserOrNull } from "@/lib/auth";
 import { RegistroForm } from "./registro-form";
 import styles from "../access.module.css";
 
 export default async function RegistroPage() {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (session) redirect("/onboarding");
+  if (session) {
+    // Con sesión activa, redirige según el estado: si ya tiene un espacio
+    // configurado va directo a su área; si no, completa el onboarding.
+    const membership = await activeMembershipForUserOrNull(session.user.id);
+    redirect(membership ? "/agenda" : "/onboarding");
+  }
 
   return (
     <div className={styles.shell}>
