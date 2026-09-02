@@ -70,7 +70,7 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
   const [errors, setErrors] = useState<Errors>({});
   const [complete, setComplete] = useState(false);
   const [isPending, setIsPending] = useState(false);
-  const [redirectTo, setRedirectTo] = useState("/agenda");
+  const [redirectTo, setRedirectTo] = useState("/dashboard");
   const [countryName, setCountryName] = useState<string>(COUNTRY_OPTIONS[0].name);
   const activeCountry = COUNTRY_OPTIONS.find((c) => c.name === countryName) ?? COUNTRY_OPTIONS[0];
   const isClinic = profile === "clinic";

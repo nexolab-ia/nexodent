@@ -8,7 +8,7 @@ import styles from "../access.module.css";
 
 export default async function LoginPage() {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (session) redirect("/agenda");
+  if (session) redirect("/dashboard");
 
   return (
     <div className={styles.shell}>

@@ -9,7 +9,7 @@ type FieldName = "name" | "country" | "city" | "address" | "primaryPhone" | "sec
 type OnboardingErrors = Partial<Record<FieldName, string>>;
 
 export type OnboardingResult =
-  | { ok: true; organizationId: string; redirectTo: "/agenda" }
+  | { ok: true; organizationId: string; redirectTo: "/dashboard" }
   | { ok: false; errors: OnboardingErrors };
 
 const phonePattern = /^[\d +-]{6,20}$/;
@@ -65,7 +65,7 @@ export async function createOnboarding(formData: FormData): Promise<OnboardingRe
     `;
     const created = rows[0];
     if (!created) return { ok: false, errors: { form: "No pudimos crear tu espacio. Inténtalo nuevamente." } };
-    return { ok: true, organizationId: created.organizationId, redirectTo: "/agenda" };
+    return { ok: true, organizationId: created.organizationId, redirectTo: "/dashboard" };
   } catch (error) {
     if (error instanceof Error && error.message.includes("already onboarded")) {
       return { ok: false, errors: { form: "Tu cuenta ya tiene un espacio activo. Vuelve a ingresar para continuar." } };

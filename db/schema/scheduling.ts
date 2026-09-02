@@ -1,10 +1,13 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, index, pgEnum, pgTable, text, time, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, check, foreignKey, index, pgEnum, pgTable, text, time, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { createdAt, id, jsonData, organizationId, updatedAt } from "./core";
+import { patients } from "./clinical";
 import { memberships, organizations, sites } from "./tenant";
 
 export const appointmentStatus = pgEnum("appointment_status", ["pending", "confirmed", "cancelled"]);
 export const appointmentKind = pgEnum("appointment_kind", ["appointment", "block"]);
+export const appointmentAttendance = ["attended", "missed"] as const;
+export type AppointmentAttendance = (typeof appointmentAttendance)[number];
 
 export const workingHours = pgTable("working_hours", {
   id: id(), organizationId: organizationId().references(() => organizations.id, { onDelete: "cascade" }),
@@ -26,8 +29,8 @@ export const boxes = pgTable("boxes", {
 export const appointments = pgTable("appointments", {
   id: id(), organizationId: organizationId().references(() => organizations.id, { onDelete: "cascade" }), siteId: uuid("site_id").references(() => sites.id, { onDelete: "restrict" }),
   professionalMembershipId: uuid("professional_membership_id").notNull().references(() => memberships.id, { onDelete: "restrict" }), boxId: uuid("box_id").references(() => boxes.id, { onDelete: "restrict" }),
-  kind: appointmentKind("kind").notNull().default("appointment"), status: appointmentStatus("status").notNull().default("pending"), patientName: varchar("patient_name", { length: 160 }).notNull(), patientContact: varchar("patient_contact", { length: 160 }), startsAt: timestamp("starts_at", { withTimezone: true }).notNull(), endsAt: timestamp("ends_at", { withTimezone: true }).notNull(), notes: text("notes"), cancellationReason: varchar("cancellation_reason", { length: 500 }), source: varchar("source", { length: 32 }).notNull().default("internal"), createdAt: createdAt(), updatedAt: updatedAt(),
-}, (table) => [check("appointments_valid_interval", sql`${table.startsAt} < ${table.endsAt}`), index("appointments_scope_time_idx").on(table.organizationId, table.siteId, table.startsAt)]);
+  kind: appointmentKind("kind").notNull().default("appointment"), status: appointmentStatus("status").notNull().default("pending"), patientId: uuid("patient_id"), patientName: varchar("patient_name", { length: 160 }).notNull(), patientContact: varchar("patient_contact", { length: 160 }), attendance: varchar("attendance", { length: 16 }), startsAt: timestamp("starts_at", { withTimezone: true }).notNull(), endsAt: timestamp("ends_at", { withTimezone: true }).notNull(), notes: text("notes"), cancellationReason: varchar("cancellation_reason", { length: 500 }), source: varchar("source", { length: 32 }).notNull().default("internal"), createdAt: createdAt(), updatedAt: updatedAt(),
+}, (table) => [check("appointments_valid_interval", sql`${table.startsAt} < ${table.endsAt}`), check("appointments_attendance_valid", sql`(${table.kind} <> 'appointment') OR ${table.attendance} IS NULL OR ${table.attendance} IN ('attended', 'missed')`), check("appointments_cancelled_attendance_empty", sql`(${table.status} <> 'cancelled') OR ${table.attendance} IS NULL`), foreignKey({ columns: [table.patientId, table.organizationId], foreignColumns: [patients.id, patients.organizationId], name: "appointments_patient_tenant_fk" }), index("appointments_scope_time_idx").on(table.organizationId, table.siteId, table.startsAt)]);
 
 export const appointmentHistory = pgTable("appointment_history", { id: id(), organizationId: organizationId().references(() => organizations.id, { onDelete: "cascade" }), appointmentId: uuid("appointment_id").notNull().references(() => appointments.id, { onDelete: "cascade" }), actorMembershipId: uuid("actor_membership_id"), action: varchar("action", { length: 32 }).notNull(), before: jsonData("before"), after: jsonData("after"), reason: varchar("reason", { length: 500 }), createdAt: createdAt() }, (table) => [index("appointment_history_scope_idx").on(table.organizationId, table.appointmentId, table.createdAt)]);
 

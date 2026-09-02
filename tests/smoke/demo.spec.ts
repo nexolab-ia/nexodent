@@ -9,20 +9,18 @@ describe("access routes", () => {
     ]);
     expect(page).toContain("<LoginForm />");
     expect(form).toContain("/api/auth/sign-in/email");
-    expect(form).toContain('router.replace("/agenda")');
+    expect(form).toContain('router.replace("/dashboard")');
     expect(form).toContain('role="alert"');
   });
 
-  it("keeps demo credentials server-only and offers a real entry action", async () => {
+  it("routes demo entry through registration and lands the sign-in endpoint on the dashboard", async () => {
     const [page, route, fixture] = await Promise.all([
       readFile("app/demo/page.tsx", "utf8"),
       readFile("app/api/demo/sign-in/route.ts", "utf8"),
       readFile("db/fixtures/demo.ts", "utf8"),
     ]);
-    expect(page).toContain("Explorar la demo");
-    expect(page).not.toContain("DEMO_PASSWORD");
-    expect(route).toContain("env.DEMO_PASSWORD");
-    expect(route).toContain('new URL("/agenda"');
+    expect(page).toContain('redirect("/registro")');
+    expect(route).toContain('redirect("/dashboard")');
     expect(fixture).toContain("DATOS FICTICIOS");
   });
 

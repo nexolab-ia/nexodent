@@ -13,7 +13,7 @@ export default async function RegistroPage() {
     // Con sesión activa, redirige según el estado: si ya tiene un espacio
     // configurado va directo a su área; si no, completa el onboarding.
     const membership = await activeMembershipForUserOrNull(session.user.id);
-    redirect(membership ? "/agenda" : "/onboarding");
+    redirect(membership ? "/dashboard" : "/onboarding");
   }
 
   return (

@@ -26,7 +26,7 @@ export function LoginForm() {
         setError(response.status === 401 ? "Email o contraseña incorrectos" : "No pudimos iniciar sesión. Intenta nuevamente.");
         return;
       }
-      router.replace("/agenda");
+      router.replace("/dashboard");
       router.refresh();
     } catch {
       setError("No pudimos conectar con NexoDent. Intenta nuevamente.");

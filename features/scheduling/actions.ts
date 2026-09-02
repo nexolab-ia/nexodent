@@ -1,5 +1,5 @@
 import type { Sql, TransactionSql } from "postgres";
-import { can, type Capability } from "@/features/tenant-identity/authorize";
+import { authorize, can, type Capability } from "@/features/tenant-identity/authorize";
 import type { TenantContext } from "@/lib/tenancy";
 import { assertInterval, assertSantiagoTimezone, isWithinHours, localWeekday, localTime, SchedulingConflictError, SchedulingValidationError, type AppointmentStatus, type Weekday } from "./domain";
 import {scheduleConfiguredAppointmentNotice} from "@/features/notifications/integration";
@@ -59,6 +59,26 @@ export async function cancelAppointment(sql: SchedulingSql, actor: TenantContext
   if (!rows[0]) throw new SchedulingValidationError("La cita no está disponible para cancelar.");
   await sql`INSERT INTO appointment_history (organization_id, appointment_id, actor_membership_id, action, after, reason) VALUES (${rows[0].organizationId}, ${appointmentId}, ${actor.membershipId}, 'cancelled', ${JSON.stringify({ status: "cancelled" })}::jsonb, ${reason.trim()})`;
   await scheduleConfiguredAppointmentNotice(sql,actor,appointmentId,"cancellation");
+}
+
+type MutableAppointment={organizationId:string;siteId:string|null;professionalMembershipId:string;kind:"appointment"|"block";status:AppointmentStatus;attendance:"attended"|"missed"|null};
+async function mutableAppointment(sql:SchedulingSql,actor:TenantContext,appointmentId:string):Promise<MutableAppointment>{
+ const row=(await sql<MutableAppointment[]>`SELECT organization_id AS "organizationId",site_id AS "siteId",professional_membership_id AS "professionalMembershipId",kind,status,attendance FROM appointments WHERE id=${appointmentId}`)[0];
+ if(!row)throw new SchedulingValidationError("La cita no está disponible.");
+ if(actor.role==="professional"){if(row.professionalMembershipId!==actor.membershipId)throw new SchedulingValidationError("No tienes permisos para modificar esta agenda.");}
+ else {try{authorize({...actor,resourceSiteId:row.siteId},"appointment:schedule");}catch{throw new SchedulingValidationError("No tienes permisos para modificar esta agenda.");}}
+ return row;
+}
+export async function confirmAppointment(sql:SchedulingSql,actor:TenantContext,appointmentId:string):Promise<void>{
+ const before=await mutableAppointment(sql,actor,appointmentId);if(before.kind!=="appointment"||before.status!=="pending")throw new SchedulingValidationError("La cita no está pendiente de confirmación.");
+ await sql`UPDATE appointments SET status='confirmed',updated_at=now() WHERE id=${appointmentId}`;
+ await sql`INSERT INTO appointment_history(organization_id,appointment_id,actor_membership_id,action,before,after) VALUES(${before.organizationId},${appointmentId},${actor.membershipId},'status.confirmed',${JSON.stringify({status:before.status})}::jsonb,${JSON.stringify({status:"confirmed"})}::jsonb)`;
+}
+export async function markAppointmentAttendance(sql:SchedulingSql,actor:TenantContext,appointmentId:string,attendance:"attended"|"missed"):Promise<void>{
+ if(attendance!=="attended"&&attendance!=="missed")throw new SchedulingValidationError("La asistencia no es válida.");
+ const before=await mutableAppointment(sql,actor,appointmentId);if(before.kind!=="appointment"||before.status==="cancelled")throw new SchedulingValidationError("No puedes marcar asistencia en esta cita.");
+ await sql`UPDATE appointments SET attendance=${attendance},updated_at=now() WHERE id=${appointmentId}`;
+ await sql`INSERT INTO appointment_history(organization_id,appointment_id,actor_membership_id,action,before,after) VALUES(${before.organizationId},${appointmentId},${actor.membershipId},'attendance.marked',${JSON.stringify({attendance:before.attendance})}::jsonb,${JSON.stringify({attendance})}::jsonb)`;
 }
 
 export { localTime };
