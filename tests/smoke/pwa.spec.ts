@@ -1,0 +1,3 @@
+import {describe,expect,it} from "vitest";import {readFile} from "node:fs/promises";
+const routes=[["/","app/page.tsx"],["/agenda","app/(app)/agenda/page.tsx"],["/patients","app/(app)/patients/page.tsx"],["/offline","app/offline/page.tsx"]] as const;
+describe("PWA route matrix",()=>{for(const [route,file] of routes)it(`exposes ${route}`,async()=>expect((await readFile(file,"utf8")).length).toBeGreaterThan(20));it("contains a bounded 360px responsive composition",async()=>{const css=await readFile("app/globals.css","utf8");expect(css).toContain("@media(max-width:760px)");expect(css).toContain("min-width:0");expect(css).not.toMatch(/min-width:\s*3[7-9]\dpx/)})});

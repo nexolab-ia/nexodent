@@ -1,0 +1,14 @@
+node_modules
+.next
+.env
+.env.local
+coverage
+
+.test-postgres
+
+# Artefactos locales de agentes de desarrollo
+.agents/
+.codex/
+.atl/
+tsconfig.tsbuildinfo
+.next/

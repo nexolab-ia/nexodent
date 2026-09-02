@@ -1,0 +1,60 @@
+schema: spec-driven
+project: dental-saas
+artifact_store: openspec
+
+context: |
+  Product-discovery workspace for NexoDent, a dental SaaS.
+  No application project or implementation stack is present yet.
+  Architecture and target stack remain intentionally undecided until exploration.
+  Current repository artifacts are product, design, and execution briefs only.
+  Testing, linting, type checking, formatting, and build tooling are not configured.
+
+strict_tdd: false
+
+projects: []
+
+testing:
+  detected: "2026-09-02"
+  workspace_test_command: null
+  projects: []
+  test_layers:
+    unit: unavailable
+    integration: unavailable
+    e2e: unavailable
+  coverage:
+    available: false
+    command: null
+  quality:
+    linter: null
+    type_checker: null
+    formatter: null
+  limitation: >-
+    Strict TDD is disabled because no project roots and no explicit workspace-level
+    test command covering an in-scope project set were discovered. Re-run sdd-init
+    after the implementation workspace and workspace-wide test command exist.
+
+rules:
+  proposal:
+    - Keep scope within the approved NexoDent product direction.
+    - Include rollback or exit criteria for risky decisions.
+  specs:
+    - Use RFC 2119 keywords for normative requirements.
+    - Express acceptance scenarios with Given/When/Then.
+  design:
+    - Treat DESIGN.md as authoritative for the later design phase.
+    - Record architecture decisions and their rationale.
+  tasks:
+    - Group work by phase with hierarchical numbering.
+    - Keep each task independently verifiable.
+  apply:
+    guidelines:
+      - Follow the architecture and stack approved after exploration.
+      - Do not modify PRODUCT.md or DESIGN.md unless explicitly authorized.
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Preserve archived changes as an immutable audit trail.

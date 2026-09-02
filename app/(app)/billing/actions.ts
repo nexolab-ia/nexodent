@@ -1,0 +1,3 @@
+"use server";
+import { revalidatePath } from "next/cache"; import { sql } from "@/db/client"; import { postManualMovement } from "@/features/manual-billing/actions"; import { requestTenantContext } from "@/lib/request-context"; import { runAsTenant } from "@/lib/tenancy";
+export async function registerManualPayment(formData:FormData):Promise<void>{const actor=await requestTenantContext();await runAsTenant(sql,actor,tx=>postManualMovement(tx,actor,{patientId:String(formData.get("patientId")),siteId:String(formData.get("siteId")??"")||undefined,kind:"payment",amountClp:Number(formData.get("amountClp")),reason:String(formData.get("reason")),evidence:{reference:String(formData.get("reference"))}}));revalidatePath("/billing");}

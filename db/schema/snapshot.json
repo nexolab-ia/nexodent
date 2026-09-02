@@ -1,0 +1,1 @@
+{"version":"0002","extensions":["pgcrypto","btree_gist"],"tables":["organizations","users","sites","memberships","membership_sites","audit_logs","sessions","accounts","verifications"],"rls":true}

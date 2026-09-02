@@ -1,0 +1,9 @@
+"use client";
+import { useState, type FormEvent } from "react";
+
+export function PublicBookingForm({ orgSlug, siteSlug, token }: { orgSlug: string; siteSlug?: string; token: string }) {
+  const [message, setMessage] = useState("");
+  async function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const data = Object.fromEntries(new FormData(event.currentTarget)); try { const response = await fetch("/api/public/booking", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, orgSlug, siteSlug, token, consent: data.consent === "on" }) }); const result = await response.json() as { reference?: string; error?: string }; setMessage(response.ok ? `Reserva recibida. Código: ${result.reference}` : result.error ?? "No pudimos procesar tu reserva."); } catch { setMessage("No pudimos procesar tu reserva. Inténtalo nuevamente."); } }
+  if (!token) return <p role="status">No encontramos disponibilidad para esta reserva.</p>;
+  return <form className="booking-form" onSubmit={submit}><label>Nombre<input name="patientName" required autoComplete="name" /></label><label>Teléfono o correo<input name="patientContact" required autoComplete="email" /></label><label>Inicio<input name="startsAt" type="datetime-local" required /></label><label>Término<input name="endsAt" type="datetime-local" required /></label><label>Profesional<input name="professionalMembershipId" required aria-describedby="professional-help" /></label><small id="professional-help">Selecciona un profesional disponible desde el enlace enviado por la clínica.</small><label><input name="consent" type="checkbox" required /> Acepto que estos datos se usen únicamente para gestionar esta reserva.</label><button type="submit">Solicitar reserva</button>{message && <p role="status" className="inline-notice">{message}</p>}</form>;
+}

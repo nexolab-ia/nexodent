@@ -1,0 +1,3 @@
+"use server";
+import { revalidatePath } from "next/cache"; import { sql } from "@/db/client"; import { createEstimate } from "@/features/estimates/actions"; import { requestTenantContext } from "@/lib/request-context"; import { runAsTenant } from "@/lib/tenancy";
+export async function createEstimateDraft(formData:FormData):Promise<void>{const actor=await requestTenantContext();await runAsTenant(sql,actor,tx=>createEstimate(tx,actor,String(formData.get("patientId")),[{feeScheduleId:String(formData.get("feeScheduleId")),quantity:Number(formData.get("quantity")),discountClp:Number(formData.get("discountClp")??0)}]));revalidatePath("/estimates");}

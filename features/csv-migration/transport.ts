@@ -1,0 +1,4 @@
+export const migrationUploadHeaders={fileName:"x-migration-filename",sourceType:"x-migration-source",mapping:"x-migration-mapping"} as const;
+export function csvUploadRequest(file:Blob&{name:string},sourceType:string,mapping:Record<string,string>):{method:"POST";headers:Record<string,string>;body:Blob}{return{method:"POST",headers:{"content-type":"text/csv",[migrationUploadHeaders.fileName]:encodeURIComponent(file.name),[migrationUploadHeaders.sourceType]:sourceType,[migrationUploadHeaders.mapping]:encodeURIComponent(JSON.stringify(mapping))},body:file};}
+
+export function readCsvUploadMetadata(headers:Headers):{fileName:string;sourceType:string;mapping:Record<string,string>}{return{fileName:decodeURIComponent(headers.get(migrationUploadHeaders.fileName)??"migration.csv"),sourceType:headers.get(migrationUploadHeaders.sourceType)??"",mapping:JSON.parse(decodeURIComponent(headers.get(migrationUploadHeaders.mapping)??"%7B%7D")) as Record<string,string>};}

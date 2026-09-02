@@ -1,0 +1,1 @@
+"use client";import {useEffect} from "react";import {registerServiceWorker} from "@/lib/offline";export function ServiceWorkerRegistration(){useEffect(()=>{registerServiceWorker().catch(()=>{/* The app remains network-only when registration is unavailable. */})},[]);return null}

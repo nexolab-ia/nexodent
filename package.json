@@ -1,0 +1,46 @@
+{
+  "name": "nexodent",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint app db lib features workers tests middleware.ts",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:smoke": "vitest run tests/smoke",
+    "seed": "tsx db/seed.ts",
+    "db:migrate": "tsx db/migrate.ts",
+    "db:rollback": "tsx db/rollback.ts"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "latest",
+    "better-auth": "latest",
+    "drizzle-orm": "latest",
+    "next": "16.1.1",
+    "postgres": "latest",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "latest",
+    "@eslint/js": "^9.36.0",
+    "@tailwindcss/postcss": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "eslint": "^9.36.0",
+    "eslint-config-next": "16.1.1",
+    "tailwindcss": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "typescript-eslint": "latest",
+    "vitest": "latest"
+  }
+}

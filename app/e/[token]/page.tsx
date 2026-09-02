@@ -1,0 +1,4 @@
+import { sql } from "@/db/client";
+import { publicEstimateByToken } from "@/features/estimates/actions";
+const clp = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
+export default async function PublicEstimatePage({ params }: { params: Promise<{ token: string }> }) { const { token } = await params; const estimate = await publicEstimateByToken(sql, token).catch(() => null); if (!estimate) return <main><h1>Cotización NexoDent</h1><p className="empty-state">Esta cotización no está disponible o su enlace fue revocado.</p></main>; return <main><h1>Cotización NexoDent</h1><p>Estado: {estimate.state}</p><ul>{estimate.items.map((item) => <li key={item.code}>{item.description} × {item.quantity}: {clp.format(item.lineTotalClp)}</li>)}</ul><p>Total: <strong>{clp.format(estimate.totalClp)}</strong></p><p>Aprobar esta cotización no inicia ningún pago en línea.</p></main>; }

@@ -1,0 +1,108 @@
+import { readFile, readdir } from "node:fs/promises";
+import { join } from "node:path";
+import postgres from "postgres";
+import { hashPassword } from "better-auth/crypto";
+import { insertDemoFixture } from "./fixtures/demo";
+
+/**
+ * Provision de producción (idempotente). Se ejecuta UNA vez por despliegue con
+ * credenciales administrativas (DATABASE_URL_ADMIN) y deja la base lista para
+ * que la app corra con un rol NOSUPERUSER NOBYPASSRLS (FORCE RLS activo).
+ *
+ * 1. Crea el rol de aplicación `nexodent_app` si no existe.
+ * 2. Aplica las migraciones SQL en orden (una sola vez, con tabla de control).
+ * 3. Otorga al rol de aplicación USAGE + DML sobre el schema public y EXECUTE
+ *    sobre las funciones públicas (SECURITY DEFINER incluidas).
+ * 4. Carga el fixture demo (idempotente, ON CONFLICT).
+ * 5. Crea la credencial de acceso del usuario demo si no existe.
+ *
+ * Env:
+ *   DATABASE_URL_ADMIN   conexión con rol con BYPASSRLS (owner/superusuario)
+ *   APP_DB_ROLE_PASSWORD password del rol nexodent_app (sin $)
+ *   DEMO_EMAIL           email del usuario demo (debe existir tras el seed)
+ *   DEMO_PASSWORD        password de acceso del usuario demo
+ */
+
+const qident = (value: string) => '"' + value.replace(/"/g, '""') + '"';
+const qlit = (value: string) => "'" + value.replace(/'/g, "''") + "'";
+
+export async function provision(databaseUrl = process.env.DATABASE_URL_ADMIN): Promise<void> {
+  if (!databaseUrl) throw new Error("DATABASE_URL_ADMIN is required to provision.");
+  const roleName = process.env.APP_DB_ROLE_NAME ?? "nexodent_app";
+  const rolePassword = process.env.APP_DB_ROLE_PASSWORD;
+  if (!rolePassword) throw new Error("APP_DB_ROLE_PASSWORD is required to provision.");
+  const controlTable = "_nexodent_schema_migrations";
+  const admin = postgres(databaseUrl, { max: 1 });
+  try {
+    // 1. Rol de aplicación: NOBYPASSRLS para que FORCE RLS aplique de verdad.
+    await admin.unsafe(
+      `DO $$ BEGIN
+         IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = ${qlit(roleName)}) THEN
+           EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L NOSUPERUSER NOBYPASSRLS', ${qlit(roleName)}, ${qlit(rolePassword)});
+         END IF;
+       END $$;`
+    );
+
+    // 2. Migraciones una sola vez.
+    await admin.unsafe(
+      `CREATE TABLE IF NOT EXISTS ${qident(controlTable)} (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())`
+    );
+    const applied = new Set(
+      (await admin.unsafe<{ name: string }[]>(`SELECT name FROM ${qident(controlTable)}`)).map((row) => row.name)
+    );
+    const files = (await readdir(join(process.cwd(), "db/migrations")))
+      .filter((file) => file.endsWith(".sql"))
+      .sort();
+    const pending = files.filter((file) => !applied.has(file));
+    if (pending.length > 0) {
+      for (const file of pending) {
+        const sql = await readFile(join(process.cwd(), "db/migrations", file), "utf8");
+        await admin.unsafe(sql);
+        await admin.unsafe(`INSERT INTO ${qident(controlTable)} (name) VALUES (${qlit(file)}) ON CONFLICT (name) DO NOTHING`);
+      }
+      console.info(`Provision: aplicadas ${pending.length} migraciones (${pending.join(", ")}).`);
+    } else {
+      console.info("Provision: sin migraciones pendientes.");
+    }
+
+    // 3. Grants del rol de aplicación (idempotente: cubre tablas existentes).
+    await admin.unsafe(`GRANT USAGE ON SCHEMA public TO ${qident(roleName)}`);
+    await admin.unsafe(`GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ${qident(roleName)}`);
+    await admin.unsafe(`GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${qident(roleName)}`);
+    await admin.unsafe(`GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO ${qident(roleName)}`);
+
+    // 4. Fixture demo (idempotente).
+    await insertDemoFixture(admin);
+    console.info("Provision: fixture demo cargado.");
+
+    // 5. Credencial del usuario demo (provider credential de Better Auth).
+    const demoEmail = process.env.DEMO_EMAIL ?? "emilia.demo@nexodent.invalid";
+    const demoPassword = process.env.DEMO_PASSWORD;
+    if (!demoPassword) throw new Error("DEMO_PASSWORD is required to provision.");
+    const demoUser = await admin<{ id: string }[]>`SELECT id FROM users WHERE email = ${demoEmail}`;
+    if (!demoUser[0]) throw new Error(`Demo user ${demoEmail} not found after seed.`);
+    const userId = demoUser[0].id;
+    const existing = await admin<{ id: string }[]>`
+      SELECT id FROM accounts WHERE provider_id = 'credential' AND account_id = ${userId}`;
+    if (!existing[0]) {
+      const hash = await hashPassword(demoPassword);
+      await admin.unsafe(
+        `INSERT INTO accounts (user_id, account_id, provider_id, password) VALUES ($1, $2, 'credential', $3)`,
+        [userId, userId, hash]
+      );
+      console.info(`Provision: credencial demo creada para ${demoEmail}.`);
+    } else {
+      console.info("Provision: credencial demo ya existía.");
+    }
+    console.info("Provision: listo.");
+  } finally {
+    await admin.end();
+  }
+}
+
+if (process.argv[1]?.endsWith("provision.ts")) {
+  provision().catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : "Provision failed.");
+    process.exitCode = 1;
+  });
+}
