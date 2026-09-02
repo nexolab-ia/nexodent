@@ -27,8 +27,22 @@ describe("access routes", () => {
   });
 
   it("synchronizes stale demo credential hashes idempotently", async () => {
-    const provision = await readFile("db/provision.ts", "utf8");
+    const [migration, authSchema, provision] = await Promise.all([
+      readFile("db/migrations/0007_add_accounts_issuer.sql", "utf8"),
+      readFile("db/schema/auth.ts", "utf8"),
+      readFile("db/provision.ts", "utf8"),
+    ]);
+
+    expect(migration).toContain("ADD COLUMN IF NOT EXISTS issuer varchar(255)");
+    expect(migration).toContain(
+      "SET issuer = 'local:credential' WHERE provider_id = 'credential' AND (issuer IS NULL OR issuer = '')",
+    );
+    expect(authSchema).toContain('issuer: varchar("issuer", { length: 255 })');
     expect(provision).toContain("verifyPassword");
-    expect(provision).toContain("ON CONFLICT (provider_id, account_id) DO UPDATE SET password = EXCLUDED.password");
+    expect(provision).toContain("provider_id, issuer, password");
+    expect(provision).toContain("'credential', 'local:credential'");
+    expect(provision).toContain(
+      "DO UPDATE SET password = EXCLUDED.password, issuer = 'local:credential'",
+    );
   });
 });

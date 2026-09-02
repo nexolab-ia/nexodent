@@ -90,9 +90,9 @@ export async function provision(databaseUrl = process.env.DATABASE_URL_ADMIN): P
     if (!passwordMatches) {
       const hash = await hashPassword(demoPassword);
       await admin.unsafe(
-        `INSERT INTO accounts (user_id, account_id, provider_id, password)
-         VALUES ($1, $2, 'credential', $3)
-         ON CONFLICT (provider_id, account_id) DO UPDATE SET password = EXCLUDED.password, updated_at = now()`,
+        `INSERT INTO accounts (user_id, account_id, provider_id, issuer, password)
+         VALUES ($1, $2, 'credential', 'local:credential', $3)
+         ON CONFLICT (provider_id, account_id) DO UPDATE SET password = EXCLUDED.password, issuer = 'local:credential', updated_at = now()`,
         [userId, userId, hash]
       );
       console.info(`Provision: credencial demo sincronizada para ${demoEmail}.`);
