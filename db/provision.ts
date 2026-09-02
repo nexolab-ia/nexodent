@@ -1,7 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import postgres from "postgres";
-import { hashPassword } from "better-auth/crypto";
+import { hashPassword, verifyPassword } from "better-auth/crypto";
 import { insertDemoFixture } from "./fixtures/demo";
 
 /**
@@ -14,7 +14,7 @@ import { insertDemoFixture } from "./fixtures/demo";
  * 3. Otorga al rol de aplicación USAGE + DML sobre el schema public y EXECUTE
  *    sobre las funciones públicas (SECURITY DEFINER incluidas).
  * 4. Carga el fixture demo (idempotente, ON CONFLICT).
- * 5. Crea la credencial de acceso del usuario demo si no existe.
+ * 5. Sincroniza la credencial de acceso del usuario demo.
  *
  * Env:
  *   DATABASE_URL_ADMIN   conexión con rol con BYPASSRLS (owner/superusuario)
@@ -82,17 +82,22 @@ export async function provision(databaseUrl = process.env.DATABASE_URL_ADMIN): P
     const demoUser = await admin<{ id: string }[]>`SELECT id FROM users WHERE email = ${demoEmail}`;
     if (!demoUser[0]) throw new Error(`Demo user ${demoEmail} not found after seed.`);
     const userId = demoUser[0].id;
-    const existing = await admin<{ id: string }[]>`
-      SELECT id FROM accounts WHERE provider_id = 'credential' AND account_id = ${userId}`;
-    if (!existing[0]) {
+    const existing = await admin<{ id: string; password: string | null }[]>`
+      SELECT id, password FROM accounts WHERE provider_id = 'credential' AND account_id = ${userId}`;
+    const passwordMatches = existing[0]?.password
+      ? await verifyPassword({ hash: existing[0].password, password: demoPassword })
+      : false;
+    if (!passwordMatches) {
       const hash = await hashPassword(demoPassword);
       await admin.unsafe(
-        `INSERT INTO accounts (user_id, account_id, provider_id, password) VALUES ($1, $2, 'credential', $3)`,
+        `INSERT INTO accounts (user_id, account_id, provider_id, password)
+         VALUES ($1, $2, 'credential', $3)
+         ON CONFLICT (provider_id, account_id) DO UPDATE SET password = EXCLUDED.password, updated_at = now()`,
         [userId, userId, hash]
       );
-      console.info(`Provision: credencial demo creada para ${demoEmail}.`);
+      console.info(`Provision: credencial demo sincronizada para ${demoEmail}.`);
     } else {
-      console.info("Provision: credencial demo ya existía.");
+      console.info("Provision: credencial demo vigente.");
     }
     console.info("Provision: listo.");
   } finally {

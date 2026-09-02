@@ -6,6 +6,8 @@ const schema = z.object({
   AUTH_SECRET: z.string().min(32).optional(),
   AUTH_URL: optionalUrl,
   APP_URL: z.string().url().default("http://localhost:3000"),
+  DEMO_EMAIL: z.string().email().default("emilia.demo@nexodent.invalid"),
+  DEMO_PASSWORD: z.string().min(1).optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 

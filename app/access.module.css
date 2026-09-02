@@ -1,0 +1,13 @@
+.shell{min-height:100dvh;background:radial-gradient(circle at 50% 20%,rgba(34,211,238,.1),transparent 32%),var(--bg)}
+.header{width:min(100%,76rem);margin-inline:auto;padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.backLink,.demoLink a{color:var(--accent);font-weight:700;text-decoration-thickness:1px}
+.main{min-height:calc(100dvh - 82px);display:grid;place-items:center;padding-block:3rem}
+.card{width:min(100%,30rem);padding:clamp(1.5rem,5vw,2.25rem);border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
+.heading{margin-block-end:1.75rem}.heading h1{margin:0;font-size:clamp(2rem,7vw,2.75rem);letter-spacing:-.03em}.heading p,.demoLink,.detail{color:var(--muted)}
+.form{display:grid;gap:1.15rem}.form input{background:var(--bg)}
+.primaryButton{width:100%;min-height:3rem;margin-block-start:.25rem}
+.alert{margin:0;padding:.7rem .8rem;border:1px solid var(--danger);border-radius:10px;background:rgba(248,113,113,.08);color:#fecaca}
+.demoLink{margin:1.5rem 0 0;text-align:center}
+.notice{margin:0 0 1.5rem;padding:.75rem;border:1px solid var(--warning);border-radius:10px;color:#fde68a;background:rgba(251,191,36,.08);font-weight:700;text-align:center}
+.clinic{margin-block:1.5rem;padding-block:1.25rem;border-block:1px solid var(--border)}.clinic h2{margin:0 0 .35rem;font-size:1.35rem}.clinic p{margin:.25rem 0;color:var(--muted)}
+@media (max-width:36rem){.header{padding-inline:1.25rem}.main{padding:1.25rem}.backLink{font-size:.9rem}.card{padding:1.35rem}}
