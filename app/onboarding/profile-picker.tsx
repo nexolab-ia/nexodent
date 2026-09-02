@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createOnboarding } from "./actions";
+import { CHILE_REGIONS } from "./regions";
 import styles from "../access.module.css";
 
 type ProfileId = "professional" | "clinic" | "join";
@@ -27,6 +28,24 @@ function Field({ name, label, type = "text", placeholder, optional, error }: { n
   return <label className={styles.profileField}>
     <span>{label}{optional && <small> (opcional)</small>}</span>
     <input name={name} type={type} placeholder={placeholder} aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined} />
+    {error && <small id={errorId} className={styles.fieldError} role="alert">{error}</small>}
+  </label>;
+}
+
+// Selector de ciudad agrupado por región de Chile: al desplegarse muestra cada
+// región (optgroup) con sus principales ciudades (option).
+function CityField({ error }: { error?: string }) {
+  const errorId = "city-error";
+  return <label className={styles.profileField}>
+    <span>Ciudad</span>
+    <select name="city" defaultValue="" aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined}>
+      <option value="" disabled>Selecciona tu ciudad…</option>
+      {CHILE_REGIONS.map((region) => (
+        <optgroup key={region.id} label={region.label}>
+          {region.cities.map((city) => <option key={city} value={city}>{city}</option>)}
+        </optgroup>
+      ))}
+    </select>
     {error && <small id={errorId} className={styles.fieldError} role="alert">{error}</small>}
   </label>;
 }
@@ -92,7 +111,7 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
       <div className={styles.formGrid}>
         <Field name="name" label={isClinic ? "Nombre de la clínica" : "Nombre"} error={errors.name} />
         <Field name="country" label="País" placeholder="Chile" error={errors.country} />
-        <Field name="city" label="Ciudad" error={errors.city} />
+        <CityField error={errors.city} />
         <Field name="address" label="Dirección" error={errors.address} />
         <Field name="primaryPhone" label="Teléfono principal" type="tel" error={errors.primaryPhone} />
         <Field name="secondaryPhone" label="Teléfono secundario" type="tel" optional error={errors.secondaryPhone} />
