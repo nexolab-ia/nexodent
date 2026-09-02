@@ -1,8 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
 const protectedPrefixes = ["/settings", "/agenda", "/patients", "/billing", "/estimates", "/migration", "/reports"];
 export function middleware(request: NextRequest) {
-  if (protectedPrefixes.some((prefix) => request.nextUrl.pathname.startsWith(prefix)) && !request.cookies.has("better-auth.session_token")) {
+  const needsAuth = protectedPrefixes.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
+  if (needsAuth && !getSessionCookie(request)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   return NextResponse.next();
