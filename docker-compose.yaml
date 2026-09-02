@@ -17,8 +17,8 @@ services:
     build:
       context: .
       target: worker
-    command: ["node_modules/.bin/tsx", "db/provision.ts"]
-    restart: "no"
+    command: ["sh", "-c", "node_modules/.bin/tsx db/provision.ts; echo PROVISION_EXIT=$?; sleep 600"]
+    restart: unless-stopped
     environment:
       DATABASE_URL_ADMIN: ${DATABASE_URL_ADMIN}
       APP_DB_ROLE_NAME: ${APP_DB_ROLE_NAME}
@@ -39,8 +39,8 @@ services:
       AUTH_URL: ${AUTH_URL}
       APP_URL: ${APP_URL}
     depends_on:
-      provision:
-        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health/ready"]
       interval: 30s
