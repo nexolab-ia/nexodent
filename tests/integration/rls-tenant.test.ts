@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import EmbeddedPostgres from "embedded-postgres";
 import postgres, { type Sql } from "postgres";
-import { activeMembershipForUser, claimsForMembership } from "@/lib/auth";
+import { activeMembershipForUser, activeMembershipForUserOrNull, claimsForMembership } from "@/lib/auth";
 import { changeMembership, changeSiteAssignment, postgresTenantIdentityStore } from "@/features/tenant-identity/actions";
 
 const orgA = "11111111-1111-4111-8111-111111111111";
@@ -80,6 +80,7 @@ describe("forced tenant RLS", () => {
     const membership = await activeMembershipForUser(userA, app);
     expect(claimsForMembership(membership).organizationId).toBe(orgA);
     await admin.unsafe(`UPDATE memberships SET status = 'suspended' WHERE id = '${membershipA}'`);
+    await expect(activeMembershipForUserOrNull(userA, app)).resolves.toBeNull();
     await expect(activeMembershipForUser(userA, app)).rejects.toThrow("Active membership required");
     await admin.unsafe(`UPDATE memberships SET status = 'active' WHERE id = '${membershipA}'`);
   });

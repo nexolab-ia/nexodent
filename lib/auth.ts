@@ -17,7 +17,7 @@ export function claimsForMembership(membership: MembershipForSession, now = new 
   return { membershipId: membership.membershipId, organizationId: membership.organizationId, role: membership.role, siteIds: membership.siteIds, expiresAt: membership.expiresAt };
 }
 
-export async function activeMembershipForUser(userId: string, client: Sql = sql): Promise<MembershipForSession> {
+export async function activeMembershipForUserOrNull(userId: string, client: Sql = sql): Promise<MembershipForSession | null> {
   // Bootstrap de sesión: se ejecuta ANTES de conocer el tenant (sin GUC app.organization_id).
   // Bajo FORCE RLS un SELECT directo devolvería 0 filas y nadie podría iniciar sesión.
   // Por eso se resuelve vía app_resolve_active_membership (SECURITY DEFINER, owner de migración,
@@ -28,8 +28,13 @@ export async function activeMembershipForUser(userId: string, client: Sql = sql)
       expires_at AS "expiresAt", site_ids AS "siteIds"
     FROM app_resolve_active_membership(${userId})`;
   const membership = rows[0];
+  return membership ? { ...membership, active: true } : null;
+}
+
+export async function activeMembershipForUser(userId: string, client: Sql = sql): Promise<MembershipForSession> {
+  const membership = await activeMembershipForUserOrNull(userId, client);
   if (!membership) throw new APIError("UNAUTHORIZED", { message: "Active membership required." });
-  return { ...membership, active: true };
+  return membership;
 }
 
 const env = readEnv();
@@ -42,6 +47,9 @@ export const auth = betterAuth({
     database: { generateId: "uuid" },
     ipAddress: { ipAddressHeaders: ["x-forwarded-for"] },
   },
-  databaseHooks: { session: { create: { before: async (session) => { await activeMembershipForUser(session.userId); } } } },
-  plugins: [customSession(async ({ user, session }) => ({ user, session, claims: claimsForMembership(await activeMembershipForUser(user.id)) }))],
+  databaseHooks: { session: { create: { before: async (session) => { await activeMembershipForUserOrNull(session.userId); } } } },
+  plugins: [customSession(async ({ user, session }) => {
+    const membership = await activeMembershipForUserOrNull(user.id);
+    return { user, session, claims: membership ? claimsForMembership(membership) : null };
+  })],
 });
