@@ -1,1 +1,3 @@
-import {Logo} from "@/components/brand/logo";export function SiteHeader(){return <header className="site-header"><nav className="site-nav" aria-label="Navegación principal"><Logo/><div className="site-links"><a href="#funcionalidades">Funcionalidades</a><a href="#precios">Precios</a><a href="#avisos">Avisos IA</a><a className="button button-primary" href="/registro">Empezar 7 días gratis</a></div></nav></header>}
+import {Logo} from "@/components/brand/logo";
+import {ThemeToggle} from "@/components/layout/theme-toggle";
+export function SiteHeader(){return <header className="site-header"><nav className="site-nav" aria-label="Navegación principal"><Logo/><div className="site-links"><a href="#funcionalidades">Funcionalidades</a><a href="#precios">Precios</a><a href="#avisos">Avisos IA</a><ThemeToggle/><a className="button button-primary" href="/registro">Empezar 7 días gratis</a></div></nav></header>}

@@ -7,8 +7,11 @@
 .form{display:grid;gap:1.15rem}.form input{background:var(--bg)}
 .primaryButton{width:100%;min-height:3rem;margin-block-start:.25rem}
 .alert{margin:0;padding:.7rem .8rem;border:1px solid var(--danger);border-radius:10px;background:rgba(248,113,113,.08);color:#fecaca}
-.demoLink{margin:1.5rem 0 0;text-align:center}
+[data-theme="light"] .alert{background:rgba(220,61,67,.10);color:#b91c1c}
+[data-theme="light"] .fieldError{color:#b91c1c}
 .notice{margin:0 0 1.5rem;padding:.75rem;border:1px solid var(--warning);border-radius:10px;color:#fde68a;background:rgba(251,191,36,.08);font-weight:700;text-align:center}
+[data-theme="light"] .notice{color:#92400e;background:rgba(180,83,9,.10)}
+.demoLink{margin:1.5rem 0 0;text-align:center}
 .clinic{margin-block:1.5rem;padding-block:1.25rem;border-block:1px solid var(--border)}.clinic h2{margin:0 0 .35rem;font-size:1.35rem}.clinic p{margin:.25rem 0;color:var(--muted)}
 .wideCard{width:min(100%,40rem)}
 .welcomeCard{text-align:center}.welcomeIcon{display:block;margin:0 auto 1.25rem;color:var(--accent)}.welcomeLead{font-size:1.15rem;line-height:1.55}.buttonLink{display:flex;align-items:center;justify-content:center;margin-block-start:1.75rem;text-decoration:none}

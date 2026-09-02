@@ -23,7 +23,7 @@ export default async function LoginPage() {
             <p>Gestiona agenda, pacientes y operación desde un solo lugar.</p>
           </div>
           <LoginForm />
-          <p className={styles.demoLink}>¿Quieres conocer NexoDent? <Link href="/demo">Explora la demo</Link></p>
+          <p className={styles.demoLink}>¿Aún no tienes cuenta? <Link href="/registro">Crea una gratis</Link></p>
         </section>
       </main>
     </div>

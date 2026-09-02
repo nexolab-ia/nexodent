@@ -30,7 +30,6 @@ export default async function RegistroPage() {
           </div>
           <RegistroForm />
           <p className={styles.demoLink}>¿Ya tienes cuenta? <Link href="/login">Entra</Link></p>
-          <p className={styles.demoLink}>¿Prefieres conocer NexoDent primero? <Link href="/demo">Explora la demo</Link></p>
         </section>
       </main>
     </div>
