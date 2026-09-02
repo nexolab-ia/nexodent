@@ -39,8 +39,8 @@ export const auth = betterAuth({
   baseURL: env.AUTH_URL ?? env.APP_URL,
   emailAndPassword: { enabled: true },
   advanced: {
-    generateId: () => crypto.randomUUID(),
-    ipAddress: { ipAddressHeaders: ["x-forwarded-for"], trustedProxies: ["::ffff:127.0.0.1"] },
+    database: { generateId: "uuid" },
+    ipAddress: { ipAddressHeaders: ["x-forwarded-for"] },
   },
   databaseHooks: { session: { create: { before: async (session) => { await activeMembershipForUser(session.userId); } } } },
   plugins: [customSession(async ({ user, session }) => ({ user, session, claims: claimsForMembership(await activeMembershipForUser(user.id)) }))],
