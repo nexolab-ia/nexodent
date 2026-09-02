@@ -17,11 +17,7 @@ export default async function OnboardingPage() {
         <Link href="/" className={styles.backLink}>Volver al inicio</Link>
       </header>
       <main className={styles.main}>
-        <section className={`${styles.card} ${styles.wideCard}`} aria-labelledby="onboarding-title">
-          <div className={styles.heading}>
-            <h1 id="onboarding-title">¿Qué tipo de espacio quieres configurar?</h1>
-            <p>Elige la opción que mejor describa cómo trabajas.</p>
-          </div>
+        <section className={`${styles.card} ${styles.wideCard}`} aria-label="Configuración inicial de NexoDent">
           <ProfilePicker />
         </section>
       </main>
