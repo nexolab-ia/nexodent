@@ -32,19 +32,26 @@ export default async function OrganizacionPage({ searchParams }: { searchParams:
     {ok === "schedule" && <p className="inline-notice notice-banner" role="status">Horario de atención actualizado.</p>}
 
     <form action={updateOrganizationProfile}><section className="settings-card">
-      <header><h2>Información de la clínica</h2><p className="muted">Datos básicos y de contacto.</p></header>
-      <div className="card-grid">
-        <div className="logo-cell"><OrgLogoPicker name="logo" initial={settings.logo ?? null}/><p className="muted logo-help">PNG, JPG o WebP de máximo 200×200 px.</p></div>
-        <div className="organization-form-fields">
+      <header><h2>Información de la clínica</h2><p className="muted">Imagen, datos básicos y de contacto.</p></header>
+      <div className="organization-logo-row">
+        <OrgLogoPicker name="logo" initial={settings.logo ?? null}>
+          <strong>Imagen de la clínica</strong>
+          <p className="muted">Logo o imagen representativa (200×200 px máximo)</p>
+        </OrgLogoPicker>
+      </div>
+      <div className="organization-fields">
+        <div className="organization-col">
           <label>Nombre de la clínica<input name="name" defaultValue={organization.name} minLength={2} maxLength={160} required/></label>
-          <label>Dirección<input name="address" defaultValue={contact.address ?? ""} required/></label>
           <label>Ciudad<select name="city" defaultValue={contact.city ?? ""} required>
             <option value="" disabled>Selecciona la ciudad…</option>
             {contact.city && !knownCities.has(contact.city) && <option value={contact.city}>{contact.city}</option>}
             {regions.map((region) => <optgroup key={region.id} label={region.label}>{region.cities.map((city) => <option key={city} value={city}>{city}</option>)}</optgroup>)}
           </select></label>
-          <label>Email de contacto<input type="email" name="contactEmail" defaultValue={contact.contactEmail ?? ""} required/></label>
           <PhoneField name="primaryPhone" label="Teléfono principal" initialValue={contact.primaryPhone} required/>
+        </div>
+        <div className="organization-col">
+          <label>Dirección<input name="address" defaultValue={contact.address ?? ""} required/></label>
+          <label>Email de contacto<input type="email" name="contactEmail" defaultValue={contact.contactEmail ?? ""} required/></label>
           <PhoneField name="secondaryPhone" label="Teléfono secundario" initialValue={contact.secondaryPhone} optional/>
         </div>
       </div>
@@ -52,7 +59,7 @@ export default async function OrganizacionPage({ searchParams }: { searchParams:
     </section></form>
 
     <form action={updateOrganizationSchedule}><section className="settings-card">
-      <header><h2>Horario de atención</h2><p className="muted">Horas de apertura y cierre de la clínica.</p></header>
+      <header><h2>Horario de atención</h2><p className="muted">Define el horario de apertura y cierre de la clínica.</p></header>
       <div className="form-row">
         <label>Horario de apertura<input type="time" name="openTime" defaultValue={schedule.openTime ?? ""} required/></label>
         <label>Horario de cierre<input type="time" name="closeTime" defaultValue={schedule.closeTime ?? ""} required/></label>

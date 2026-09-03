@@ -1,12 +1,12 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { type ReactNode, useId, useRef, useState } from "react";
 import NextImage from "next/image";
 
-type OrgLogoPickerProps = { name: string; initial?: string | null };
+type OrgLogoPickerProps = { name: string; initial?: string | null; children?: ReactNode };
 const IMAGE_ERROR = "No pudimos leer la imagen. Prueba con PNG o JPG de máximo 200×200 px.";
 
-export function OrgLogoPicker({ name, initial = null }: OrgLogoPickerProps) {
+export function OrgLogoPicker({ name, initial = null, children }: OrgLogoPickerProps) {
   const inputId = useId();
   const fileInput = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState(initial);
@@ -53,14 +53,17 @@ export function OrgLogoPicker({ name, initial = null }: OrgLogoPickerProps) {
 
   return <div className="logo-picker">
     <div className="logo-preview">
-      {preview ? <NextImage src={preview} alt="Logo de la clínica" width={88} height={88} unoptimized/> : <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m5 18 5-5 3 3 2-2 4 4"/></svg>}
+      {preview ? <NextImage src={preview} alt="Logo de la clínica" width={96} height={96} unoptimized/> : <><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7.5 8.4 5h7.2L17 7.5h2A2 2 0 0 1 21 9.5v8A2 2 0 0 1 19 19H5a2 2 0 0 1-2-2v-7.5a2 2 0 0 1 2-2h2Z"/><circle cx="12" cy="13" r="3.25"/></svg><span>Sin imagen</span></>}
     </div>
-    <div className="logo-actions">
-      <label className="button" htmlFor={inputId}>Subir logo</label>
-      {(preview || initial) && <button type="button" className="button" onClick={clearLogo}>Quitar</button>}
+    <div className="logo-caption">
+      {children}
+      <div className="logo-actions">
+        <label className="button" htmlFor={inputId}>Cambiar imagen</label>
+        {(preview || initial) && <button type="button" className="button" onClick={clearLogo}>Quitar</button>}
+      </div>
+      {error && <p className="field-error" role="alert">{error}</p>}
     </div>
     <input ref={fileInput} id={inputId} className="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => chooseFile(event.target.files?.[0])}/>
     {value && <input type="hidden" name={name} value={value}/>} {cleared && <input type="hidden" name="logoClear" value="1"/>}
-    {error && <p className="field-error" role="alert">{error}</p>}
   </div>;
 }
