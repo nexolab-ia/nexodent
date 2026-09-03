@@ -1142,7 +1142,7 @@ textarea[aria-invalid="true"] {
   position: fixed;
   inset-block: 0;
   inset-inline: auto 0;
-  width: min(36rem, 100%);
+  width: min(53.125rem, 100%); /* máx 850px (decisión Bryan 2026-09-03) */
   max-width: none;
   max-height: 100dvh;
   height: 100dvh;
