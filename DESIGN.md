@@ -2,6 +2,8 @@
 
 Diseño moderno, limpio, tipo fintech/SaaS premium. EXPLÍCITAMENTE distinto a CIMAOS (look clínico tradicional) y Dentalink (legacy). No debe "verse como ya" — nada de verdes clínicos, azules médicos genéricos ni plantillas de software médico.
 
+> ⚠️ Complemento normativo: **`UX-PRINCIPIOS.md`** (mobile-first, presupuesto de clics, ledger claro, estados texto+color, checklist de verificación). Todo brief de UI DEBE cumplir ambos documentos y citar la "Verificación UX" de UX-PRINCIPIOS.md. Research que los sustenta: `docs/research-ux/` (2026-09-03).
+
 ## Modo de diseño (Impeccable)
 
 - **Mode**: Operate (dashboard SaaS) + Persuade en landing pública
@@ -52,14 +54,14 @@ Diseño moderno, limpio, tipo fintech/SaaS premium. EXPLÍCITAMENTE distinto a C
 - **Testimonios + CTA final + Footer** oscuro con columnas.
 
 ### Dashboard (app, tras login — dark)
-- **Sidebar** compacto: Agenda, Pacientes, Presupuestos, Cobros, Reportes, Configuración. Íconos SVG de línea, active = cian con barra lateral.
+- **Sidebar** compacto: Agenda, Pacientes, Presupuestos, Cobros, Reportes, Configuración. Íconos SVG de línea, active = cian con barra lateral. En <768px el sidebar se REEMPLAZA por bottom tab bar (Hoy · Agenda · Pacientes · Cobros · Perfil) — ver UX-PRINCIPIOS.md P1.
 - **Topbar**: buscador global, avisos IA (campana con badge), perfil.
-- **Agenda**: vista semana/día, grid por profesional/box, citas como chips de color por estado (confirmada/pendiente/cancelada), drag & drop, click para nueva cita. Panel derecho con detalle de la cita.
+- **Agenda**: vista semana/día, grid por profesional/box, citas como chips de color por estado (confirmada/pendiente/cancelada), drag & drop, click para nueva cita. Panel derecho con detalle de la cita. En tablet vertical: hit-areas amplios, detalle en bottom-sheet. Estados SIEMPRE chip texto+color (no solo color).
 - **Ficha paciente**: header con datos + estado de cuenta, tabs (Evoluciones, Odontograma, Documentos, Cobros). Odontograma SVG interactivo por pieza.
 - **Presupuestos**: lista + editor con búsqueda de prestaciones, total, estado; botón "compartir link público".
-- **Cobros**: tabla de abonos por paciente, saldo, botón registrar pago, cuenta corriente.
+- **Cobros**: tabla de abonos por paciente, saldo, botón registrar pago, cuenta corriente. Estilo "accounting real": separar visualmente pago paciente vs aseguradora; saldo trazable a la línea (UX-PRINCIPIOS.md P3).
 - **Reportes IA**: KPIs (recaudación, deuda, producción por profesional) con gráficos simples (SVG/barras) + feed de "Avisos de tu clínica" con sugerencias y botones "Aplicar" / "Ver detalle".
-- **Modo claro**: opcional en settings; por defecto dark.
+- **Modo claro**: opcional en settings; por defecto dark. Ambos con contraste AA desde el día 1.
 
 ## Anti-patrones (prohibido)
 
@@ -71,6 +73,10 @@ Diseño moderno, limpio, tipo fintech/SaaS premium. EXPLÍCITAMENTE distinto a C
 - ❌ Sin más de 2-3 fuentes (Space Grotesk + Inter + JetBrains Mono opcional)
 - ❌ Sin formularios sin estados de error inline y focus visible
 - ❌ No copiar el copy de CIMAOS textualmente (parafrasear el concepto, no las frases)
+- ❌ Sin estados de cita solo con color (siempre chip texto+color) — ver UX-PRINCIPIOS.md P4
+- ❌ Sin flujos de >2 clics en tareas diarias (agenda, pago, asistencia) — ver UX-PRINCIPIOS.md P2
+- ❌ Sin navegación móvil colapsada: <768px = bottom tab bar, funcionalidad completa (no "solo lectura") — ver UX-PRINCIPIOS.md P1
+- ❌ Sin etiquetas financieras inventadas ni líneas de ledger confusas — ver UX-PRINCIPIOS.md P3
 
 ## Microcopy de conversión
 
