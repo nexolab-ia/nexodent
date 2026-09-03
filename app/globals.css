@@ -1110,6 +1110,113 @@ textarea[aria-invalid="true"] {
   stroke-linejoin: round;
 }
 
+.settings-layout {
+  display: grid;
+  grid-template-columns: 15.5rem minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+  max-width: 72rem;
+}
+.settings-nav {
+  position: sticky;
+  top: 1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.settings-nav-section,
+.settings-nav-items {
+  display: grid;
+  gap: 0.25rem;
+}
+.settings-group {
+  margin: 0.25rem 0 0.35rem;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.settings-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.settings-nav a:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.settings-nav a[aria-current="page"] {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+.settings-nav svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+.settings-content {
+  min-width: 0;
+}
+.settings-scaffold {
+  display: grid;
+  gap: 1rem;
+}
+.settings-scaffold header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.settings-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 767px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .settings-nav {
+    position: static;
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-block-end: 0.35rem;
+  }
+  .settings-nav-section,
+  .settings-nav-items {
+    display: contents;
+  }
+  .settings-group {
+    display: none;
+  }
+  .settings-nav a {
+    white-space: nowrap;
+  }
+}
+
 /* Authenticated topbar */
 .tenant-identity {
   overflow: hidden;
