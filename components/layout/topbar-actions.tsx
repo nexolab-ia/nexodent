@@ -10,6 +10,7 @@ import {
   type PatientSearchResult,
 } from "@/app/(app)/patients/actions";
 import { signOut } from "@/app/(app)/profile/actions";
+import { COUNTRY_OPTIONS } from "@/app/onboarding/regions";
 
 type IconName = "search" | "plus" | "calendar-plus" | "bell" | "profile";
 function ActionIcon({ name }: { name: IconName }) {
@@ -58,6 +59,7 @@ export function TopbarActions({
   pendingNotifications: number;
   convenios: ConvenioOption[];
 }) {
+  const regions = COUNTRY_OPTIONS[0].regions;
   const [searchOpen, setSearchOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [tab, setTab] = useState<"personal" | "dental">("personal");
@@ -370,7 +372,20 @@ export function TopbarActions({
               </div>
               <label className="field-full">
                 Ciudad
-                <input name="city" autoComplete="address-level2" />
+                <select name="city" defaultValue="">
+                  <option value="" disabled>
+                    Selecciona una ciudad…
+                  </option>
+                  {regions.map((region) => (
+                    <optgroup key={region.id} label={region.label}>
+                      {region.cities.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
               </label>
               <label className="field-full">
                 Dirección
