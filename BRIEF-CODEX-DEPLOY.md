@@ -44,3 +44,17 @@ Dockerfile multi-stage: deps (npm ci) → build (next build) → web (standalone
 - NO despliegues nada sin decir exactamente qué comando usarás.
 - No imprimas secretos.
 - Al terminar crea REPORTE-CODEX-DEPLOY.md en el repo dental-saas (o en /tmp si no hay repo) con hallazgos y fix propuesto, y DETENTE.
+
+## Epílogo 2026-09-03 — migraciones 0007-0009 aplicadas (RESUELTO)
+Síntoma: dashboard con el menú nuevo (Buscar paciente / Clínica Sonrisa / Calendario…) no aparecía tras redeploys de la rama main con migraciones 0007-0009.
+Causa raíz: el servicio `provision` del compose es ONE-SHOT (`restart: no`) — corre migraciones SOLO cuando el stack se CREA. Los redeploys normales de Coolify reusan el contenedor existente y NO re-ejecutan provision, así que la DB de prod quedó en 0006.
+Fix aplicado (verificado OK):
+1. `POST /api/v1/applications/<uuid>/stop` → esperar estado `exited`/`stopped`.
+2. `POST /api/v1/deploy?uuid=<uuid>` → al recrear el stack, provision corre de nuevo y aplica las pendientes. Deploy `gc4rsfnofwrpinlsgifsz1w7` terminó `finished` (2026-09-03T17:23Z), web "Ready in 194ms".
+3. Verificación funcional OK en https://dental.nexolabs.cloud: health 200, sign-in emilia.demo OK, /dashboard 200 con todo el menú (Buscar paciente, Nuevo paciente, Agenda/Calendario, Configuración, Pacientes, Clínica Sonrisa, Perfil) y vistas ?date=&scope=clinic|own OK.
+
+PITFALLS aprendidos (verificación):
+- `next-error` en el HTML NO significa error: el CSS global `.next-error` va embebido en TODA página Next (falso positivo). Verificar por markers de UI reales.
+- Si /dashboard devuelve el login page (~11.8KB, "Entra a tu clínica") es que la sesión no viajó (cookie `__Secure-better-auth.session_token` no se reusó): usar UN MISMO opener urllib con HTTPCookieProcessor para sign-in y las llamadas siguientes.
+- REST logs (`/applications/<uuid>/logs`) devuelve la cola del contenedor con logs MÁS RECIENTES (ahora el web, antes el provision): NO sirve para auditar provision post-hoc. Verificar migraciones por comportamiento de la app.
+- Patrón para "aplicar migraciones en prod": stop + deploy (recrea el stack y re-ejecuta provision). No existe trigger aislado de provision por API.
