@@ -700,6 +700,18 @@ textarea[aria-invalid="true"] {
   white-space: nowrap;
   border: 0;
 }
+/* Oculta el input file real; el label "Cambiar imagen" lo activa */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .dashboard-page {
   display: grid;
   gap: 1.25rem;
