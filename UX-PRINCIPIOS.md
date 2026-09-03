@@ -9,7 +9,7 @@
 La competencia LATAM promete móvil pero su core es desktop; los referentes globales con app la venden como "game changer" (emergencias fuera de la clínica). NexoDent se diseña móvil-primero:
 
 - Breakpoints: `360px` (celular), `768px` (tablet vertical — EL dispositivo del box), `1024px` (tablet horizontal/desktop pequeño), `1280px+` (desktop).
-- **< 768px: navegación inferior (bottom tab bar)**, 5 tabs máx, siempre visibles: `Hoy` · `Agenda` · `Pacientes` · `Cobros` · `Perfil`. El sidebar de desktop desaparece en móvil (no colapsarlo encima: reemplazarlo por tabs).
+- **< 768px: navegación inferior (bottom tab bar)**, siempre visible, con los MISMOS items del menú superior: `Dashboard` · `Calendario` · `Reportes` · `Configuración`. En desktop el menú principal es HORIZONTAL en la parte superior (decisión Bryan 2026-09-03 — sin sidebar lateral). Los módulos secundarios (Pacientes, Presupuestos, Cobros, Migración) no son tabs: se llega por contexto (dashboard, ficha de paciente, configuración).
 - Targets táctiles ≥ 44×44px; espaciado entre targets ≥ 8px. Nunca hover-only (móvil no tiene hover): acción primaria siempre visible en la fila/tarjeta.
 - **Agenda en tablet vertical**: filas de tiempo con hit-area amplio; citas = chips arrastrables (drag & drop) con gesto de mantener presionado; tap en chip → detalle como bottom-sheet (no modal centrado); swipe hacia un lado = acción rápida configurable (marcar asistencia / cancelar) con undo.
 - Botón global sticky "＋ Nueva cita / Nuevo paciente" accesible en todo momento (1 tap desde cualquier tab).
@@ -118,5 +118,5 @@ Prueba SUS ligera (opcional pero recomendada en flujos grandes): 5 usuarios, obj
 - **Ficha paciente**: header pegajoso (nombre, saldo, estado) + pestañas grandes touch (Evoluciones · Odontograma · Cobros · Documentos); odontograma con zoom/pan en táctil.
 - **Cobros / ledger**: tabla mobile-first: saldo arriba, abonos como timeline; registrar pago = bottom-sheet con monto rápido (montos frecuentes).
 - **Presupuestos**: lista con total y estado; compartir link público = 1 tap; editor de prestaciones optimizado para búsqueda (typeahead).
-- **Dashboard / Hoy**: tarjetas KPI + avisos con deep-links; pull-to-refresh.
+- **Dashboard / tab Hoy**: tarjetas KPI + avisos con deep-links; pull-to-refresh. Incluye accesos rápidos a módulos secundarios (Pacientes, Presupuestos, Cobros, Migración).
 - **Reportes**: KPI + gráficos simples SVG; export CSV/PDF; rangos de fecha con presets (Hoy/7 días/Mes).

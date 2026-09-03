@@ -54,8 +54,10 @@ Diseño moderno, limpio, tipo fintech/SaaS premium. EXPLÍCITAMENTE distinto a C
 - **Testimonios + CTA final + Footer** oscuro con columnas.
 
 ### Dashboard (app, tras login — dark)
-- **Sidebar** compacto: Agenda, Pacientes, Presupuestos, Cobros, Reportes, Configuración. Íconos SVG de línea, active = cian con barra lateral. En <768px el sidebar se REEMPLAZA por bottom tab bar (Hoy · Agenda · Pacientes · Cobros · Perfil) — ver UX-PRINCIPIOS.md P1.
-- **Topbar**: buscador global, avisos IA (campana con badge), perfil.
+- **Navegación principal: menú HORIZONTAL en la parte superior** (decisión Bryan 2026-09-03): items `Dashboard` · `Calendario` · `Reportes` · `Configuración`. Íconos SVG de línea + texto; item activo = cian con píldora/subrayado; sticky bajo la topbar. NO usar sidebar lateral.
+- En <768px los MISMOS 4 items se convierten en bottom tab bar (`Dashboard` · `Calendario` · `Reportes` · `Configuración`) — ver UX-PRINCIPIOS.md P1.
+- Módulos secundarios (Pacientes, Presupuestos, Cobros, Migración) conservan sus rutas y se acceden desde el contexto: Dashboard con accesos rápidos, ficha del paciente desde la cita, Migración desde Configuración. No son items del menú principal.
+- **Topbar**: buscador global, avisos IA (campana con badge), perfil (si el shell actual ya tiene topbar separada, el menú horizontal va debajo, sticky; si no, buscador/perfil conviven a la derecha del menú — elegir la opción menos invasiva).
 - **Agenda**: vista semana/día, grid por profesional/box, citas como chips de color por estado (confirmada/pendiente/cancelada), drag & drop, click para nueva cita. Panel derecho con detalle de la cita. En tablet vertical: hit-areas amplios, detalle en bottom-sheet. Estados SIEMPRE chip texto+color (no solo color).
 - **Ficha paciente**: header con datos + estado de cuenta, tabs (Evoluciones, Odontograma, Documentos, Cobros). Odontograma SVG interactivo por pieza.
 - **Presupuestos**: lista + editor con búsqueda de prestaciones, total, estado; botón "compartir link público".
