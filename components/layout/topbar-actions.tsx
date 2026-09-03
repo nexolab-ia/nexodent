@@ -11,6 +11,8 @@ import {
 } from "@/app/(app)/patients/actions";
 import { signOut } from "@/app/(app)/profile/actions";
 import { COUNTRY_OPTIONS } from "@/app/onboarding/regions";
+import { PhoneField } from "@/components/forms/phone-field";
+import { RutField } from "@/components/forms/rut-field";
 
 type IconName = "search" | "plus" | "calendar-plus" | "bell" | "profile";
 function ActionIcon({ name }: { name: IconName }) {
@@ -325,14 +327,7 @@ export function TopbarActions({
                 </label>
               </div>
               <div className="form-row">
-                <label>
-                  RUT
-                  <input
-                    name="rut"
-                    autoComplete="off"
-                    placeholder="12.345.678-5"
-                  />
-                </label>
+                <RutField name="rut" />
                 <label>
                   Sexo
                   <select name="sex" defaultValue="">
@@ -361,14 +356,8 @@ export function TopbarActions({
                 </label>
               </div>
               <div className="form-row">
-                <label>
-                  Teléfono principal
-                  <input name="phone" type="tel" autoComplete="tel" />
-                </label>
-                <label>
-                  Teléfono secundario
-                  <input name="phoneSecondary" type="tel" />
-                </label>
+                <PhoneField name="phone" label="Teléfono principal" autoComplete="tel" />
+                <PhoneField name="phoneSecondary" label="Teléfono secundario" autoComplete="tel" />
               </div>
               <label className="field-full">
                 Ciudad

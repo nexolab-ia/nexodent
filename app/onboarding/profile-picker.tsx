@@ -7,6 +7,7 @@ import { createOnboarding } from "./actions";
 import { COUNTRY_OPTIONS } from "./regions";
 import type { RegionOption } from "./regions";
 import styles from "../access.module.css";
+import { PhoneField } from "@/components/forms/phone-field";
 
 type ProfileId = "professional" | "clinic" | "join";
 type FieldName = "name" | "country" | "city" | "address" | "primaryPhone" | "secondaryPhone" | "email" | "accepted" | "form";
@@ -130,8 +131,8 @@ function SetupForm({ profile, onBack }: { profile: "professional" | "clinic"; on
         <CountryField error={errors.country} onChange={setCountryName} />
         <CityField regions={activeCountry.regions} error={errors.city} />
         <Field name="address" label="Dirección" error={errors.address} />
-        <Field name="primaryPhone" label="Teléfono principal" type="tel" error={errors.primaryPhone} />
-        <Field name="secondaryPhone" label="Teléfono secundario" type="tel" optional error={errors.secondaryPhone} />
+        <PhoneField name="primaryPhone" label="Teléfono principal" error={errors.primaryPhone} autoComplete="tel" required />
+        <PhoneField name="secondaryPhone" label="Teléfono secundario" optional error={errors.secondaryPhone} autoComplete="tel" />
         <Field name="email" label="Email de contacto" type="email" error={errors.email} />
       </div>
       <fieldset className={styles.consentField} aria-invalid={Boolean(errors.accepted)} aria-describedby={errors.accepted ? "accepted-error" : undefined}>

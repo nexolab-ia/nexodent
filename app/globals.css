@@ -150,6 +150,110 @@ textarea[aria-invalid="true"] {
 [role="alert"] {
   color: #fecaca;
 }
+.phone-field {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+.phone-field > span:first-child small {
+  color: var(--muted);
+  font-weight: 400;
+}
+.phone-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.35rem 0.7rem 0.35rem 0.4rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+.profile-form .phone-control {
+  background: var(--bg);
+}
+.phone-control:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.phone-field:has(input[aria-invalid="true"]) .phone-control {
+  border-color: var(--danger);
+}
+.phone-country {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: auto;
+  min-height: auto;
+  padding: 0.3rem 0.6rem 0.3rem 0.35rem;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font: 600 0.95rem var(--font-ui);
+  color: var(--ink);
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+.phone-country-picker {
+  position: relative;
+  display: inline-flex;
+}
+.phone-country-menu {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: calc(100% + 0.35rem);
+  inset-inline-start: 0;
+  display: grid;
+  min-width: 13rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+}
+.phone-country-menu button {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: start;
+  background: transparent;
+}
+.phone-flag {
+  width: 22px;
+  height: 16px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex: none;
+}
+.phone-flag-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--border);
+  color: var(--ink);
+  font-size: 0.55rem;
+}
+.phone-control input[type="tel"] {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.15rem 0;
+  min-height: auto;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+.phone-control input[type="tel"]:focus {
+  outline: none;
+}
 .mono {
   font-family: var(--font-mono);
   font-size: 0.875rem;
