@@ -2,6 +2,7 @@ import type { ConvenioOption } from "@/app/(app)/patients/actions";
 import type { ReactNode } from "react";
 import { AppNavigation } from "@/components/layout/app-navigation";
 import { TopbarActions } from "@/components/layout/topbar-actions";
+import { LogoMark } from "@/components/brand/logo";
 import type { ShellIdentity } from "@/features/tenant-identity/shell";
 
 export function AppShell({
@@ -17,13 +18,13 @@ export function AppShell({
     <div className="app-shell">
       <header className="app-header">
         <div className="topbar">
-          <a
-            className="tenant-identity"
-            href="/dashboard"
-            title={identity.displayName}
-          >
-            {identity.displayName}
+          <a className="topbar-brand" href="/dashboard" title={identity.displayName}>
+            <LogoMark />
+            <span className="tenant-identity">{identity.displayName}</span>
           </a>
+          <div className="topbar-desktop-nav">
+            <AppNavigation variant="desktop" />
+          </div>
           <TopbarActions
             userName={identity.userName}
             email={identity.email}
@@ -31,7 +32,6 @@ export function AppShell({
             convenios={convenios}
           />
         </div>
-        <AppNavigation variant="desktop" />
       </header>
       <div className="app-content">{children}</div>
       <AppNavigation variant="mobile" />

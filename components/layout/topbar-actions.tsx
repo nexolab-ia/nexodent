@@ -14,7 +14,7 @@ import { COUNTRY_OPTIONS } from "@/app/onboarding/regions";
 import { PhoneField } from "@/components/forms/phone-field";
 import { RutField } from "@/components/forms/rut-field";
 
-type IconName = "search" | "plus" | "calendar-plus" | "bell" | "profile";
+type IconName = "search" | "plus" | "calendar-plus" | "bell" | "help";
 function ActionIcon({ name }: { name: IconName }) {
   if (name === "search")
     return (
@@ -44,10 +44,22 @@ function ActionIcon({ name }: { name: IconName }) {
     );
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24">
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21a8 8 0 0 1 16 0" />
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9a2.5 2.5 0 1 1 4.25 1.8c-.95.9-1.75 1.35-1.75 2.7M12 17h.01" />
     </svg>
   );
+}
+
+function getInitials(userName: string) {
+  const honorifics = new Set(["dr", "dra", "doctor", "doctora"]);
+  const parts = userName
+    .trim()
+    .split(/\s+/)
+    .filter((part) => !honorifics.has(part.replace(/\./g, "").toLocaleLowerCase("es-CL")));
+
+  if (parts.length === 0) return "US";
+  if (parts.length === 1) return parts[0].slice(0, 2).toLocaleUpperCase("es-CL");
+  return `${parts[0][0]}${parts.at(-1)?.[0] ?? ""}`.toLocaleUpperCase("es-CL");
 }
 
 export function TopbarActions({
@@ -63,6 +75,7 @@ export function TopbarActions({
 }) {
   const regions = COUNTRY_OPTIONS[0].regions;
   const [searchOpen, setSearchOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [tab, setTab] = useState<"personal" | "dental">("personal");
   const [query, setQuery] = useState("");
@@ -70,6 +83,7 @@ export function TopbarActions({
   const [searched, setSearched] = useState(false);
   const [isSearching, startSearch] = useTransition();
   const searchRef = useRef<HTMLDivElement>(null);
+  const helpRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const patientDialog = useRef<HTMLDialogElement>(null);
   const pathname = usePathname();
@@ -78,11 +92,13 @@ export function TopbarActions({
     function closeMenus(event: MouseEvent) {
       const target = event.target as Node;
       if (!searchRef.current?.contains(target)) setSearchOpen(false);
+      if (!helpRef.current?.contains(target)) setHelpOpen(false);
       if (!profileRef.current?.contains(target)) setProfileOpen(false);
     }
     function closeWithEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setSearchOpen(false);
+        setHelpOpen(false);
         setProfileOpen(false);
       }
     }
@@ -205,6 +221,24 @@ export function TopbarActions({
             </span>
           )}
         </Link>
+        <div className="topbar-popover" ref={helpRef}>
+          <button
+            className="icon-button"
+            type="button"
+            aria-label="Ayuda"
+            title="Ayuda"
+            aria-expanded={helpOpen}
+            aria-controls="help-popover"
+            onClick={() => setHelpOpen((open) => !open)}
+          >
+            <ActionIcon name="help" />
+          </button>
+          {helpOpen && (
+            <div className="action-popover help-popover" id="help-popover" role="status">
+              <p className="muted">El centro de ayuda llegará pronto.</p>
+            </div>
+          )}
+        </div>
         <div className="topbar-popover" ref={profileRef}>
           <button
             className="icon-button"
@@ -215,7 +249,7 @@ export function TopbarActions({
             aria-controls="profile-menu"
             onClick={() => setProfileOpen((open) => !open)}
           >
-            <ActionIcon name="profile" />
+            <span className="profile-avatar" aria-hidden="true">{getInitials(userName)}</span>
           </button>
           {profileOpen && (
             <div
