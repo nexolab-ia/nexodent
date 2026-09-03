@@ -1193,6 +1193,32 @@ textarea[aria-invalid="true"] {
   letter-spacing: 0.3px;
 }
 
+.organization-settings { display: grid; gap: 1rem; width: 100%; padding: 0; }
+.organization-heading { margin-block-end: 0.25rem; }
+.organization-heading h1, .organization-heading p { margin: 0; }
+.organization-heading p { margin-block-start: 0.4rem; }
+.settings-card { display: grid; gap: 1.1rem; padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.settings-card > header h2 { margin: 0; font: 700 1.05rem var(--font-display); }
+.settings-card > header p { margin: 0.3rem 0 0; }
+.card-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.organization-form-fields { display: grid; gap: 1rem; }
+.logo-preview { display: grid; place-items: center; width: 88px; height: 88px; overflow: hidden; border: 1px dashed var(--border); border-radius: 14px; background: var(--surface-2); }
+.logo-preview img { width: 100%; height: 100%; object-fit: contain; }
+.logo-preview svg { width: 32px; fill: none; stroke: var(--muted); stroke-width: 1.5; }
+.logo-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.6rem; }
+.logo-actions .button { display: inline-flex; align-items: center; width: auto; min-height: 2.5rem; padding: 0.45rem 0.75rem; font-size: 13px; }
+.logo-help { max-width: 14rem; margin: 0.65rem 0 0; font-size: 0.82rem; }
+.logo-picker .field-error { margin: 0.65rem 0 0; padding: 0; background: transparent; box-shadow: none; font-size: 0.82rem; }
+.form-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.settings-card-actions { display: flex; justify-content: flex-end; }
+.notice-banner { padding: 0.8rem 1rem; border: 1px solid color-mix(in srgb, var(--success) 45%, var(--border)); border-radius: 10px; background: color-mix(in srgb, var(--success) 10%, var(--surface)); }
+
+@media (min-width: 560px) {
+  .card-grid { grid-template-columns: 9rem minmax(0, 1fr); }
+  .card-grid .logo-cell { grid-row: span 2; }
+  .organization-form-fields, .form-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 767px) {
   .settings-layout {
     grid-template-columns: 1fr;

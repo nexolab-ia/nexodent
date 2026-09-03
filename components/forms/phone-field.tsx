@@ -14,6 +14,7 @@ interface PhoneFieldProps {
   error?: string;
   autoComplete?: string;
   required?: boolean;
+  initialValue?: string;
 }
 
 function PhoneFlag({ code }: { code: string }) {
@@ -31,11 +32,16 @@ function PhoneFlag({ code }: { code: string }) {
   return <span className="phone-flag phone-flag-fallback" aria-label={`País ${code.toUpperCase()}`}>{code.toUpperCase()}</span>;
 }
 
-export function PhoneField({ name, label, optional, error, autoComplete, required }: PhoneFieldProps) {
+export function PhoneField({ name, label, optional, error, autoComplete, required, initialValue }: PhoneFieldProps) {
   const inputId = useId();
   const errorId = `${inputId}-error`;
   const [country, setCountry] = useState<PhoneCountry>(DEFAULT_PHONE_COUNTRY);
-  const [national, setNational] = useState("");
+  const [national, setNational] = useState(() => {
+    const value = initialValue?.trim() ?? "";
+    return value.startsWith(DEFAULT_PHONE_COUNTRY.dial)
+      ? value.slice(DEFAULT_PHONE_COUNTRY.dial.length).trim()
+      : value;
+  });
   const [countryMenuOpen, setCountryMenuOpen] = useState(false);
   const digits = national.replace(/\D/g, "").replace(/^0+/, "");
   const full = digits ? `${country.dial}${digits}` : "";
