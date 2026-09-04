@@ -17,7 +17,7 @@ export function PlanPage({ organizationName }: { organizationName: string }) {
       <p className="muted">Administra tu suscripción y métodos de pago.</p>
     </header>
     <BillingTabs activeTab={activeTab} onChange={setActiveTab} />
-    {activeTab === "plan" && <section id="billing-plan-panel" role="tabpanel" aria-labelledby="billing-plan-tab"><PlanTab account={billing.account} payments={billing.payments} onPay={billing.simulatePlanPayment} /></section>}
+    {activeTab === "plan" && <section id="billing-plan-panel" role="tabpanel" aria-labelledby="billing-plan-tab"><PlanTab account={billing.account} periods={billing.periods} payments={billing.payments} onPay={billing.simulatePlanPayment} onAddProfessional={billing.simulateAddProfessional} /></section>}
     {activeTab === "ia" && <section id="billing-ia-panel" role="tabpanel" aria-labelledby="billing-ia-tab"><IaTab account={billing.account} movements={billing.movements} onRecharge={billing.simulateCreditRecharge} /></section>}
     {activeTab === "usage" && <section id="billing-usage-panel" role="tabpanel" aria-labelledby="billing-usage-tab"><UsoTab account={billing.account} /></section>}
   </main>;

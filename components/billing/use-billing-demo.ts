@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 export const BASE_MONTHLY_PRICE = 17_850;
+export const PROFESSIONAL_ADDON_PRICE = 4_650;
 export const CREDIT_PRICE = 3.5;
 export const INCLUDED_MONTHLY_CREDITS = 200;
 
@@ -19,11 +20,15 @@ export type PeriodOption = {
   badges?: string[];
 };
 
-export const PERIOD_OPTIONS: PeriodOption[] = [
-  { id: "monthly", label: "Mensual", description: "Paga mes a mes.", months: 1, total: BASE_MONTHLY_PRICE },
-  { id: "semiannual", label: "Semestral", description: "Paga 5 meses, recibe 6.", months: 6, total: BASE_MONTHLY_PRICE * 5, previousTotal: BASE_MONTHLY_PRICE * 6, savings: BASE_MONTHLY_PRICE, badges: ["Popular", "Promoción"] },
-  { id: "annual", label: "Anual", description: "Paga 10 meses, recibe 12.", months: 12, total: BASE_MONTHLY_PRICE * 10, previousTotal: BASE_MONTHLY_PRICE * 12, savings: BASE_MONTHLY_PRICE * 2, badges: ["Promoción"] },
-];
+export function getPeriodOptions(monthlyPrice: number): PeriodOption[] {
+  return [
+    { id: "monthly", label: "Mensual", description: "Paga mes a mes.", months: 1, total: monthlyPrice },
+    { id: "semiannual", label: "Semestral", description: "Paga 5 meses, recibe 6.", months: 6, total: monthlyPrice * 5, previousTotal: monthlyPrice * 6, savings: monthlyPrice, badges: ["Popular", "Promoción"] },
+    { id: "annual", label: "Anual", description: "Paga 10 meses, recibe 12.", months: 12, total: monthlyPrice * 10, previousTotal: monthlyPrice * 12, savings: monthlyPrice * 2, badges: ["Promoción"] },
+  ];
+}
+
+export const PERIOD_OPTIONS = getPeriodOptions(BASE_MONTHLY_PRICE);
 
 export type Payment = {
   id: string;
@@ -57,13 +62,21 @@ function delay(milliseconds: number) {
 export function useBillingDemo() {
   const [expiresAt, setExpiresAt] = useState(INITIAL_EXPIRY_DATE);
   const [credits, setCredits] = useState(INCLUDED_MONTHLY_CREDITS);
+  const [professionals, setProfessionals] = useState(1);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [movements, setMovements] = useState<CreditMovement[]>([]);
+
+  const monthlyPrice = useMemo(
+    () => BASE_MONTHLY_PRICE + (professionals - 1) * PROFESSIONAL_ADDON_PRICE,
+    [professionals],
+  );
+  const periods = useMemo(() => getPeriodOptions(monthlyPrice), [monthlyPrice]);
 
   const account = useMemo(() => ({
     expiresAt,
     daysRemaining: 35,
-    professionals: 1,
+    professionals,
+    monthlyPrice,
     assistants: "Ilimitados",
     credits,
     creditsUsed: 0,
@@ -72,7 +85,7 @@ export function useBillingDemo() {
     storageUsedKb: 0,
     storageLimitGb: 1,
     documents: 0,
-  }), [credits, expiresAt]);
+  }), [credits, expiresAt, monthlyPrice, professionals]);
 
   async function simulatePlanPayment(period: PeriodOption) {
     const nextExpiry = addMonths(expiresAt, period.months);
@@ -104,7 +117,24 @@ export function useBillingDemo() {
     return movement;
   }
 
-  return { account, payments, movements, simulatePlanPayment, simulateCreditRecharge };
+  async function simulateAddProfessional(count: number) {
+    const addonMonthly = PROFESSIONAL_ADDON_PRICE * count;
+    const total = Math.round(addonMonthly * (account.daysRemaining / 30));
+    await delay(800);
+    const nextProfessionals = professionals + count;
+    const payment: Payment = {
+      id: `prof-${Date.now()}`,
+      date: new Date(),
+      concept: count === 1 ? "Agregar 1 profesional adicional" : `Agregar ${count} profesionales adicionales`,
+      amount: total,
+      method: "MercadoPago",
+    };
+    setProfessionals(nextProfessionals);
+    setPayments((current) => [payment, ...current]);
+    return { payment, professionals: nextProfessionals, total };
+  }
+
+  return { account, periods, payments, movements, simulatePlanPayment, simulateAddProfessional, simulateCreditRecharge };
 }
 
 export function formatClp(value: number) {

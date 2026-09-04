@@ -1796,6 +1796,35 @@ textarea[aria-invalid="true"] {
 .billing-payment-button, .billing-transfer-button { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; width: 100%; min-height: 44px; }
 .billing-transfer-button { background: transparent; color: var(--ink); }
 .billing-transfer-button:hover { color: var(--accent); }
+.plan-subtabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.plan-subtabs > button { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 44px; padding: 0.55rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--muted); font-weight: 700; }
+.plan-subtabs > button:hover { background: var(--surface-2); color: var(--ink); }
+.plan-subtabs > button.is-active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); color: var(--accent); }
+.plan-subtabs > button:focus-visible, .stepper-btn:focus-visible, .billing-transfer-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.add-professionals-card { gap: 1.1rem; }
+.billing-callout { display: flex; gap: 0.65rem; align-items: flex-start; padding: 0.85rem 1rem; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); font-size: 0.85rem; line-height: 1.5; }
+.billing-callout p { margin: 0; }
+.billing-callout .billing-icon { margin-block-start: 0.1rem; color: var(--accent); }
+.billing-callout.is-success { border-color: color-mix(in srgb, var(--success) 40%, var(--border)); background: color-mix(in srgb, var(--success) 10%, var(--surface)); }
+.billing-callout.is-success .billing-icon { color: var(--success); }
+.professional-stepper-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 0.25rem; }
+.professional-stepper-row p { margin: 0.3rem 0 0; font-size: 0.82rem; }
+.stepper-wrap { display: grid; justify-items: end; gap: 0.35rem; }
+.stepper-wrap > .muted { max-width: 18rem; font-size: 0.72rem; text-align: end; }
+.stepper { display: inline-flex; align-items: center; min-height: 44px; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.stepper-btn { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); font-size: 1.25rem; }
+.stepper-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 10%, var(--surface-2)); color: var(--accent); }
+.stepper-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.stepper-value { min-width: 54px; padding-inline: 1rem; color: var(--ink); font: 700 1.2rem/1 var(--font-display); font-variant-numeric: tabular-nums; text-align: center; }
+.add-cost-breakdown { padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: color-mix(in srgb, var(--surface-2) 65%, var(--surface)); }
+.add-cost-breakdown .billing-total { margin-block-start: 0.35rem; }
+.transfer-panel { display: grid; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.transfer-panel header p { margin: 0.3rem 0 0; font-size: 0.78rem; }
+.transfer-fields { display: grid; grid-template-columns: 1fr; gap: 0.8rem; padding-block: 0.85rem; border-block: 1px solid var(--border); }
+.transfer-fields > div { display: grid; gap: 0.25rem; min-width: 0; }
+.transfer-fields strong { overflow-wrap: anywhere; font-size: 0.88rem; }
+.transfer-amount { color: var(--accent); }
+.transfer-note { margin: 0; font-size: 0.75rem; line-height: 1.45; }
 .billing-history { border: 1px solid var(--border); background: var(--surface); }
 .billing-history summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.65rem; min-height: 56px; padding: 1rem 1.25rem; cursor: pointer; }
 .billing-history summary > span { font-weight: 700; }
@@ -1806,11 +1835,12 @@ textarea[aria-invalid="true"] {
 .billing-history-row:last-child { border-block-end: 0; }
 
 @media (min-width: 620px) {
+  .transfer-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .plan-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .billing-history-row { grid-template-columns: 0.8fr 1.7fr 0.8fr 0.9fr auto; align-items: center; gap: 0.75rem; }
 }
 @media (min-width: 880px) { .billing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 480px) { .plan-overview-heading { align-items: flex-start; flex-direction: column; } .period-option { grid-template-columns: auto minmax(0, 1fr); } .period-price { grid-column: 2; justify-items: start; } }
+@media (max-width: 480px) { .professional-stepper-row { align-items: stretch; flex-direction: column; } .stepper-wrap { justify-items: start; } .stepper-wrap > .muted { text-align: start; } .plan-subtabs > button { flex: 1 1 100%; } .plan-overview-heading { align-items: flex-start; flex-direction: column; } .period-option { grid-template-columns: auto minmax(0, 1fr); } .period-price { grid-column: 2; justify-items: start; } }
 @media (prefers-reduced-motion: reduce) { .billing-page *, .billing-page *::before, .billing-page *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; } }
 .ia-grid { align-items: start; }
 .ia-balance-card h2, .credit-recharge-card h2 { display: inline-flex; align-items: center; gap: 0.45rem; }
