@@ -16,7 +16,7 @@ describe("foundation configuration", () => {
   });
   it("defines a non-root standalone runtime and a fixed worker command", async () => {
     const dockerfile = await readFile("Dockerfile", "utf8");
-    const compose = await readFile("docker-compose.yml", "utf8");
+    const compose = await readFile("docker-compose.yaml", "utf8");
     expect(dockerfile).toContain("USER nexodent");
     expect(compose).toContain("workers/entrypoint.mjs");
   });
