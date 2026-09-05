@@ -35,7 +35,6 @@ export function RegistroForm() {
       }
 
       router.replace("/bienvenida");
-      router.refresh();
     } catch {
       setError("No pudimos conectar con NexoDent. Intenta nuevamente.");
     } finally {

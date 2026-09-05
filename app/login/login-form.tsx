@@ -27,7 +27,6 @@ export function LoginForm() {
         return;
       }
       router.replace("/dashboard");
-      router.refresh();
     } catch {
       setError("No pudimos conectar con NexoDent. Intenta nuevamente.");
     } finally {
