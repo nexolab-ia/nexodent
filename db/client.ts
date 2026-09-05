@@ -4,7 +4,7 @@ import { readEnv } from "@/lib/env";
 import * as schema from "@/db/schema";
 
 const env = readEnv();
-export const sql = postgres(env.DATABASE_URL ?? "postgres://localhost:5432/nexodent", { max: 3, connect_timeout: 2 });
+export const sql = postgres(env.DATABASE_URL ?? "postgres://localhost:5432/nexodent", { max: 3, prepare: false, connect_timeout: 5 });
 export const db = drizzle({ client: sql, schema });
 
 export async function databaseIsReachable(databaseUrl = readEnv().DATABASE_URL): Promise<boolean> {
